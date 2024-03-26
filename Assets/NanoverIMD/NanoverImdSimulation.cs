@@ -1,4 +1,5 @@
 using Essd;
+using Nanover.Core.Async;
 using Nanover.Core.Math;
 using Nanover.Frontend.Manipulation;
 using Nanover.Grpc;
@@ -18,7 +19,6 @@ namespace NanoverImd
     public class NanoverImdSimulation : MonoBehaviour
     {
         private const string TrajectoryServiceName = "trajectory";
-        private const string ImdServiceName = "imd";
         private const string MultiplayerServiceName = "multiplayer";
 
         private const string CommandRadiallyOrient = "multiuser/radially-orient-origins";
@@ -67,24 +67,24 @@ namespace NanoverImd
 
         /// <summary>
         /// Connect to the host address and attempt to open clients for the
-        /// trajectory and IMD services.
+        /// trajectory and multiplayer services.
         /// </summary>
         public async Task Connect(string address,
                                   int? trajectoryPort,
-                                  int? imdPort = null,
                                   int? multiplayerPort = null)
         {
             await CloseAsync();
 
+            Task trajectory = Task.CompletedTask;
+            Task multiplayer = Task.CompletedTask;
+
             if (trajectoryPort.HasValue)
-            {
-                Trajectory.OpenClient(GetChannel(address, trajectoryPort.Value));
-            }
+                trajectory = Trajectory.OpenClient(GetChannel(address, trajectoryPort.Value));
             
             if (multiplayerPort.HasValue)
-            {
-                Multiplayer.OpenClient(GetChannel(address, multiplayerPort.Value));
-            }
+                multiplayer = Multiplayer.OpenClient(GetChannel(address, multiplayerPort.Value));
+
+            await Task.WhenAll(trajectory, multiplayer);
 
             gameObject.SetActive(true);
 
@@ -119,12 +119,11 @@ namespace NanoverImd
             var services = hub.Properties["services"] as JObject;
             await Connect(hub.Address,
                           GetServicePort(TrajectoryServiceName),
-                          GetServicePort(ImdServiceName),
                           GetServicePort(MultiplayerServiceName));
 
             int? GetServicePort(string name)
             {
-                return services.ContainsKey(name) ? services[name].ToObject<int>() : (int?) null;
+                return services.ContainsKey(name) ? services[name].ToObject<int>() : null;
             }
         }
 
@@ -146,10 +145,10 @@ namespace NanoverImd
         public async Task CloseAsync()
         {
             ManipulableParticles.ClearAllGrabs();
-            Multiplayer.SimulationPose.ReleaseLock();
 
-            Trajectory.CloseClient();
-            Multiplayer.CloseClient();
+            await Task.WhenAll(
+                Trajectory.CloseClient(), 
+                Multiplayer.CloseClient());
 
             foreach (var channel in channels.Values)
             {

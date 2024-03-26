@@ -25,7 +25,6 @@ namespace NanoverImd
         private bool directConnect;
         private string directConnectAddress = "localhost";
         private string trajectoryPort = "38801";
-        private string interactionPort = "38801";
         private string multiplayerPort = "38801";
 
         private bool discovery;
@@ -120,8 +119,6 @@ namespace NanoverImd
             directConnectAddress = GUILayout.TextField(directConnectAddress);
             GUILayout.Label("Trajectory Port");
             trajectoryPort = GUILayout.TextField(trajectoryPort);
-            GUILayout.Label("IMD Port");
-            interactionPort = GUILayout.TextField(interactionPort);
             GUILayout.Label("Multiplayer Port");
             multiplayerPort = GUILayout.TextField(multiplayerPort);
 
@@ -131,7 +128,6 @@ namespace NanoverImd
                 application.Connect(
                     directConnectAddress,
                     ParseInt(trajectoryPort),
-                    ParseInt(interactionPort),
                     ParseInt(multiplayerPort));
             }
 

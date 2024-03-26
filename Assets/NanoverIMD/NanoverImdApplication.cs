@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Nanover.Core.Math;
 using UnityEngine.XR;
 using System.Collections.Generic;
+using Nanover.Grpc.Multiplayer;
 
 namespace NanoverImd
 {
@@ -21,8 +22,6 @@ namespace NanoverImd
         
         [SerializeField]
         private NanoverImdSimulation simulation;
-        
-        private InteractableScene interactableScene;
 #pragma warning restore 0649
 
         public NanoverImdSimulation Simulation => simulation;
@@ -39,17 +38,12 @@ namespace NanoverImd
 
         public PhysicallyCalibratedSpace CalibratedSpace { get; } = new PhysicallyCalibratedSpace();
 
-        public PlayAreaCollection PlayAreas { get; private set; }
-        public PlayOriginCollection PlayOrigins { get; private set; }
-
         [SerializeField]
         private UnityEvent connectionEstablished;
 
         private void Awake()
         {
             simulation.ConnectionEstablished += connectionEstablished.Invoke;
-            PlayAreas = new PlayAreaCollection(Simulation.Multiplayer);
-            PlayOrigins = new PlayOriginCollection(Simulation.Multiplayer);
         }
 
         /// <summary>
@@ -57,9 +51,8 @@ namespace NanoverImd
         /// </summary>
         public Task Connect(string address,
                             int? trajectoryPort = null,
-                            int? imdPort = null,
                             int? multiplayerPort = null) =>
-            simulation.Connect(address, trajectoryPort, imdPort, multiplayerPort);
+            simulation.Connect(address, trajectoryPort, multiplayerPort);
 
         // These methods expose the underlying async methods to Unity for use
         // in the UI so we disable warnings about not awaiting them, and use
@@ -127,7 +120,7 @@ namespace NanoverImd
                 D = TransformCornerPosition(points[3]),
             };
 
-            PlayAreas.UpdateValue(simulation.Multiplayer.AccessToken, area);
+            simulation.Multiplayer.PlayAreas.UpdateValue(simulation.Multiplayer.AccessToken, area);
 
             Vector3 TransformCornerPosition(Vector3 position)
             {
@@ -141,8 +134,10 @@ namespace NanoverImd
         /// </summary>
         private void CalibrateFromRemote()
         {
-            var key = "user-origin." + simulation.Multiplayer.AccessToken;
-            var origin = PlayOrigins.ContainsKey(key) ? PlayOrigins.GetValue(key).Transformation : UnitScaleTransformation.identity;
+            var key = simulation.Multiplayer.AccessToken;
+            var origin = simulation.Multiplayer.PlayOrigins.ContainsKey(key) 
+                       ? simulation.Multiplayer.PlayOrigins.GetValue(key).Transformation 
+                       : UnitScaleTransformation.identity;
 
             var longest = Mathf.Max(playareaSize.x, playareaSize.z);
             var offset = longest * PlayAreaRadialDisplacementFactor;

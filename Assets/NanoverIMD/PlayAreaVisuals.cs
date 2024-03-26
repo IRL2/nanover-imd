@@ -27,7 +27,7 @@ namespace NanoverImd
 
         private void Update()
         {
-            rendererPool.MapConfig(application.PlayAreas.Values, (playarea, renderer) =>
+            rendererPool.MapConfig(application.Simulation.Multiplayer.PlayAreas.Values, (playarea, renderer) =>
             {
                 renderer.positionCount = 4;
                 renderer.SetPosition(0, TransformPlayAreaPoint(playarea.A));

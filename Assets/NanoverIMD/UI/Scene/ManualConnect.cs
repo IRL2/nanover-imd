@@ -1,5 +1,4 @@
-﻿using NanoverImd;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -27,17 +26,11 @@ namespace NanoverImd.UI.Scene
         /// </summary>
         public void ConnectToServer()
         {
-            var trajectoryPort = portInput.text.Length > 0
-                                     ? (int?) int.Parse(portInput.text)
-                                     : null;
-            var imdPort = portInput.text.Length > 0
-                              ? (int?) int.Parse(portInput.text)
-                              : null;
-            var multiplayerPort = portInput.text.Length > 0
-                                      ? (int?) int.Parse(portInput.text)
-                                      : null;
+            var port = portInput.text.Length > 0
+                     ? (int?) int.Parse(portInput.text)
+                     : null;
 
-            application.Connect(hostInputField.text, trajectoryPort, imdPort, multiplayerPort);
+            application.Connect(hostInputField.text, port, port);
         }
     }
 }
