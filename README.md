@@ -21,7 +21,7 @@ If you've not already set up anaconda:
 
 * Install Anaconda (avoid Anaconda 2.7 as it is outdated)
 * Start the "Anaconda Powershell Prompt" where to type the next commands
-* Create a conda environment (here we call the environment "nanover"): `conda create -n nanover "python>3.6"`
+* Create a conda environment (here we call the environment "nanover"): `conda create -n nanover "python>3.11"`
 * Activate the conda environment: `conda activate nanover`
 
 Then:
