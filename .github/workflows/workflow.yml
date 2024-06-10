@@ -41,8 +41,8 @@ jobs:
           targetPlatform: StandaloneWindows64
           buildName: 'NanoVer iMD'
 
-build2:
-    name: Build my project ✨
+  build2:
+    name: Build Android ✨
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main'
     concurrency:
