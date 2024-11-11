@@ -156,7 +156,7 @@ namespace NanoverImd.Interaction
                 var sqrDistance = Vector3.SqrMagnitude(position - particlePosition);
 
                 var selection = visualisationScene.GetSelectionForParticle(i);
-                var interactable = (selection.Selection.InteractionMethod == ParticleSelection.InteractionMethodNone);
+                var interactable = (selection.Selection.InteractionMethod != ParticleSelection.InteractionMethodNone);
 
                 if (interactable && sqrDistance < bestSqrDistance)
                 {
