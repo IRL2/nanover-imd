@@ -172,7 +172,7 @@ namespace NanoverImd
                 point0.y = 0;
                 point1.y = 0;
 
-                CalibratedSpace.CalibrateFromTwoControlPoints(poses[0].Position, poses[1].Position);
+                CalibratedSpace.CalibrateFromTwoControlPoints(point0, point1);
             }
         }
 
